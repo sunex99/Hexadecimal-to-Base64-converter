@@ -2,8 +2,6 @@ package main
 
 import "fmt"
 
-const hexNum = "0x1A3F" // hexNum is a hexadecimal number represented as a string (format: 0x...). "0x" is the prefix for hexadecimal numbers in Go.
-
 // hexToBinary converts a hexadecimal number (as a string) to its binary representation.
 func hexToBinary(hex string) string {
 	fmt.Printf("Converting hex %s to binary...\n", hex)
@@ -91,8 +89,42 @@ func binaryToBase64(binary string) string {
 	return base64
 }
 
+// verify checks if the input string is a valid hexadecimal number and adds "0x" prefix if missing.
+func verify(hexNum string) (string, error) {
+	if len(hexNum) < 2 {
+		fmt.Printf("Error: Hexadecimal number must be at least 2 characters long.\n")
+		return "", fmt.Errorf("hexadecimal number too short")
+	}
+
+	if hexNum[:2] != "0x" {
+		fmt.Printf("Error: Hexadecimal number must start with '0x'.\n Adding '0x' prefix to the hexadecimal number.\n")
+		hexNum = "0x" + hexNum
+	}
+	// Check if string is a valid hexadecimal number
+	for i := 2; i < len(hexNum); i++ {
+		if !((hexNum[i] >= '0' && hexNum[i] <= '9') || (hexNum[i] >= 'A' && hexNum[i] <= 'F') || (hexNum[i] >= 'a' && hexNum[i] <= 'f')) {
+			fmt.Printf("Error: Invalid character '%c' in hexadecimal number.\n", hexNum[i])
+			return "", fmt.Errorf("invalid character in hexadecimal number")
+		}
+	}
+	fmt.Printf("Hexadecimal number %s is valid.\n", hexNum)
+	return hexNum, nil
+}
+
 func main() {
 	fmt.Printf("Starting the program...\n")
+	fmt.Printf("Please enter a hexadecimal number:\n")
+	var input string
+	// Read user input
+	fmt.Scanln(&input)
+
+	// Verify the hexadecimal number
+	hexNum, err := verify(input)
+	if err != nil {
+		fmt.Printf("Verification failed: %v\n", err)
+		return
+	}
+
 	b := hexToBinary(hexNum)
 	b64 := binaryToBase64(b)
 	if b64 == "" {
